@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34009.444
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PyShop.BillingService", "PyShop.BillingService.csproj", "{2F6626A0-1C19-49F1-8249-9E24A9AB7AA3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F6626A0-1C19-49F1-8249-9E24A9AB7AA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F6626A0-1C19-49F1-8249-9E24A9AB7AA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F6626A0-1C19-49F1-8249-9E24A9AB7AA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F6626A0-1C19-49F1-8249-9E24A9AB7AA3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8A1D121B-B5F6-48B8-8A6A-565B88B465B3}
+	EndGlobalSection
+EndGlobal
