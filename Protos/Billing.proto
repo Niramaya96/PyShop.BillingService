@@ -1,4 +1,3 @@
-# billing.proto
 syntax = "proto3";
 
 package billing;
