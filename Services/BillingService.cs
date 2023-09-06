@@ -5,16 +5,13 @@ namespace Billing
 {
     public class BillingService : Billing.BillingBase
     {
-        private List<User> Users;
-        public BillingService()
+        private static List<User> Users = new List<User>()
         {
-          Users = new List<User>()
-           {
               new User("boris",5000),
               new User("maria",1000),
               new User("oleg",800)
-           };
-        }
+        };
+
 
         public override async Task<Response> CoinsEmission(EmissionAmount request, ServerCallContext context)
         {
@@ -35,16 +32,22 @@ namespace Billing
         }
         public override Task<Response> MoveCoins(MoveCoinsTransaction request, ServerCallContext context)
         {
-            var dst_user = Users.Find(u => u.Name == request.DstUser);
             var src_user = Users.Find(u => u.Name == request.SrcUser);
-            if (dst_user != null && src_user != null)
-            {
-                if (true)
-                {
+            var dst_user = Users.Find(u => u.Name == request.DstUser);
 
-                }
-            }
-            return base.MoveCoins(request, context);
+            if (dst_user == null || src_user == null)
+                return Task.FromResult(new Response() { Status = Response.Types.Status.Failed });
+
+            if (src_user.Amount < request.Amount)
+                return Task.FromResult(new Response() { Status = Response.Types.Status.Failed, Comment = $"{src_user.Name} Not enough coins"});
+
+            var selected_coins = src_user.Coins.Take(((int)request.Amount)).ToList();
+            selected_coins.ForEach(c => c.History.Concat($"=> {dst_user.Name}"));
+
+            dst_user.Coins.AddRange(selected_coins);
+            src_user.Coins.RemoveAll(dst_user.Coins.Contains);
+
+            return Task.FromResult(new Response() { Status = Response.Types.Status.Ok, Comment = "Move coins complete" });
         }
         public override async Task ListUsers(None request, IServerStreamWriter<UserProfile> responseStream, ServerCallContext context)
         {
