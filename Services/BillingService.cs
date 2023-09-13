@@ -16,16 +16,18 @@ namespace Billing
         public override async Task<Response> CoinsEmission(EmissionAmount request, ServerCallContext context)
         {
            
-           var totalRating = Users.Select(x => x.Rating).Sum();
-            var lastIndex = 0;
+           var totalUsersRating = Users.Select(x => x.Rating).Sum();
+           int coinId = 0;
+           int amountCoinsPerUser = 0;
+
            for(var i = 0; i < Users.Count; i++) 
            { 
                 var user = Users[i];
-                var coinsCount = (int)Math.Round((double)user.Rating / totalRating * request.Amount);
-                for (int j = 0; j < coinsCount; j++)
+                amountCoinsPerUser = (int)Math.Round((double)user.Rating / totalUsersRating * request.Amount);
+
+                for (int j = 0; j < amountCoinsPerUser; j++)
                 {
-                    user.Coins.Add(new Coin() { Id = lastIndex, History = $"Emission:{user.Name}" });
-                    lastIndex++;
+                    user.Coins.Add(new Coin() { Id = coinId++, History = $"Emission:{user.Name}" });
                 }
            }
             return await Task.FromResult(new Response() { Status = Response.Types.Status.Ok, Comment = $"EmissionComplete" });
@@ -42,9 +44,11 @@ namespace Billing
                 return Task.FromResult(new Response() { Status = Response.Types.Status.Failed, Comment = $"{src_user.Name} Not enough coins"});
 
             var selected_coins = src_user.Coins.Take(((int)request.Amount)).ToList();
-            selected_coins.ForEach(c => c.History.Concat($"=> {dst_user.Name}"));
+
+            selected_coins.ForEach(c => c.History += $" - {dst_user.Name}");
 
             dst_user.Coins.AddRange(selected_coins);
+
             src_user.Coins.RemoveAll(dst_user.Coins.Contains);
 
             return Task.FromResult(new Response() { Status = Response.Types.Status.Ok, Comment = "Move coins complete" });
@@ -59,8 +63,19 @@ namespace Billing
         }
         public override Task<Coin> LongestHistoryCoin(None request, ServerCallContext context)
         {
-            return base.LongestHistoryCoin(request, context);
+
+            var coins = Users.SelectMany(u => u.Coins).ToList();
+
+            var histories = coins.Select(c => c.History).ToArray();
+
+            var longestHistory = histories.OrderByDescending(c => c.Length).First();
+
+            var coin = coins.Where(c => c.History == longestHistory).FirstOrDefault();
+
+            return Task.FromResult<Coin>(coin);
         }
+
+          
     }
 
 }
