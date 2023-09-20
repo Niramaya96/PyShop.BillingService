@@ -5,7 +5,7 @@ namespace Billing
 {
     public class BillingService : Billing.BillingBase
     {
-        private static List<User> Users = new List<User>()
+        private static readonly List<User> Users = new List<User>()
         {
               new User("boris",5000),
               new User("maria",1000),
@@ -37,15 +37,18 @@ namespace Billing
             var src_user = Users.Find(u => u.Name == request.SrcUser);
             var dst_user = Users.Find(u => u.Name == request.DstUser);
 
-            if (dst_user == null || src_user == null)
-                return Task.FromResult(new Response() { Status = Response.Types.Status.Failed });
+            if (dst_user == null)
+                return Task.FromResult(new Response() { Status = Response.Types.Status.Unspecified,Comment=$"{request.DstUser} not found" });
+
+            if (src_user == null)
+                return Task.FromResult(new Response() { Status = Response.Types.Status.Unspecified, Comment = $"{request.SrcUser} not found" });
 
             if (src_user.Amount < request.Amount)
                 return Task.FromResult(new Response() { Status = Response.Types.Status.Failed, Comment = $"{src_user.Name} Not enough coins"});
 
             var selected_coins = src_user.Coins.Take(((int)request.Amount)).ToList();
 
-            selected_coins.ForEach(c => c.History += $" - {dst_user.Name}");
+            selected_coins.ForEach(c => c.History += $" -> {dst_user.Name}");
 
             dst_user.Coins.AddRange(selected_coins);
 
@@ -75,7 +78,6 @@ namespace Billing
             return Task.FromResult<Coin>(coin);
         }
 
-          
     }
 
 }
